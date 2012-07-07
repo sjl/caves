@@ -13,7 +13,7 @@ Run `lein deps` to pull down deps.
 Follow along with the entries by using tags:
 
     hg update entry-06
-    git checkout entry-06o
+    git checkout entry-06
 
 That will put you at the code as it stood right at the *end* of entry number
 six, so you can see how it all works together.
