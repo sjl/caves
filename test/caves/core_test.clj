@@ -9,13 +9,9 @@
 
 (deftest test-start
   (let [game (new Game nil [(new UI :start)] nil)]
-
-    (testing "Enter wins at the starting screen."
-      (let [result (process-input game :enter)]
-        (is (= (current-ui result) :win))))
-
-    (testing "Other keys lose at the starting screen."
+    (testing "Any key sends you to the play screen and generates a world."
       (let [results (map (partial process-input game)
-                         [\space \a \A :escape :up :backspace])]
+                         [:enter \space \a \A :escape :up :backspace])]
         (doseq [result results]
-          (is (= (current-ui result) :lose)))))))
+          (is (= (current-ui result) :play))
+          (is (not= nil (:world result))))))))

@@ -1,16 +1,20 @@
 (ns caves.core
+  (:use [caves.world :only [random-world]])
   (:require [lanterna.screen :as s]))
 
 
+; Constants -------------------------------------------------------------------
+(def screen-size [80 24])
+
 ; Data Structures -------------------------------------------------------------
 (defrecord UI [kind])
-(defrecord World [])
 (defrecord Game [world uis input])
 
 ; Utility Functions -----------------------------------------------------------
 (defn clear-screen [screen]
-  (let [blank (apply str (repeat 80 \space))]
-    (doseq [row (range 24)]
+  (let [[cols rows] screen-size
+        blank (apply str (repeat cols \space))]
+    (doseq [row (range rows)]
       (s/put-string screen 0 row blank))))
 
 
@@ -21,7 +25,10 @@
 
 (defmethod draw-ui :start [ui game screen]
   (s/put-string screen 0 0 "Welcome to the Caves of Clojure!")
-  (s/put-string screen 0 1 "Press enter to win, anything else to lose."))
+  (s/put-string screen 0 1 "Press any key to continue.")
+  (s/put-string screen 0 2 "")
+  (s/put-string screen 0 3 "Once in the game, you can use enter to win,")
+  (s/put-string screen 0 4 "and backspace to lose."))
 
 (defmethod draw-ui :win [ui game screen]
   (s/put-string screen 0 0 "Congratulations, you win!")
@@ -30,6 +37,22 @@
 (defmethod draw-ui :lose [ui game screen]
   (s/put-string screen 0 0 "Sorry, better luck next time.")
   (s/put-string screen 0 1 "Press escape to exit, anything else to restart."))
+
+(defmethod draw-ui :play [ui {{:keys [tiles]} :world :as game} screen]
+  (let [[cols rows] screen-size
+        vcols cols
+        vrows (dec rows)
+        start-x 0
+        start-y 0
+        end-x (+ start-x vcols)
+        end-y (+ start-y vrows)]
+    (doseq [[vrow-idx mrow-idx] (map vector
+                                     (range 0 vrows)
+                                     (range start-y end-y))
+            :let [row-tiles (subvec (tiles mrow-idx) start-x end-x)]]
+      (doseq [vcol-idx (range vcols)
+              :let [{:keys [glyph color]} (row-tiles vcol-idx)]]
+        (s/put-string screen vcol-idx vrow-idx glyph {:fg color})))))
 
 (defn draw-game [game screen]
   (clear-screen screen)
@@ -44,9 +67,15 @@
     (:kind (last (:uis game)))))
 
 (defmethod process-input :start [game input]
-  (if (= input :enter)
-    (assoc game :uis [(new UI :win)])
-    (assoc game :uis [(new UI :lose)])))
+  (-> game
+    (assoc :world (random-world))
+    (assoc :uis [(new UI :play)])))
+
+(defmethod process-input :play [game input]
+  (case input
+    :enter     (assoc game :uis [(new UI :win)])
+    :backspace (assoc game :uis [(new UI :lose)])
+    game))
 
 (defmethod process-input :win [game input]
   (if (= input :escape)
@@ -72,10 +101,7 @@
         (recur (process-input (dissoc game :input) input))))))
 
 (defn new-game []
-  (new Game
-       (new World)
-       [(new UI :start)]
-       nil))
+  (new Game nil [(new UI :start)] nil))
 
 (defn main
   ([screen-type] (main screen-type false))
