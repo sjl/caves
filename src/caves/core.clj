@@ -14,6 +14,30 @@
       (s/put-string screen 0 row blank))))
 
 
+; Drawing ---------------------------------------------------------------------
+(defmulti draw-ui
+  (fn [ui game screen]
+    (:kind ui)))
+
+(defmethod draw-ui :start [ui game screen]
+  (s/put-string screen 0 0 "Welcome to the Caves of Clojure!")
+  (s/put-string screen 0 1 "Press enter to win, anything else to lose."))
+
+(defmethod draw-ui :win [ui game screen]
+  (s/put-string screen 0 0 "Congratulations, you win!")
+  (s/put-string screen 0 1 "Press escape to exit, anything else to restart."))
+
+(defmethod draw-ui :lose [ui game screen]
+  (s/put-string screen 0 0 "Sorry, better luck next time.")
+  (s/put-string screen 0 1 "Press escape to exit, anything else to restart."))
+
+(defn draw-game [game screen]
+  (clear-screen screen)
+  (doseq [ui (:uis game)]
+    (draw-ui ui game screen))
+  (s/redraw screen))
+
+
 ; Input -----------------------------------------------------------------------
 (defmulti process-input
   (fn [game input]
@@ -36,30 +60,6 @@
 
 (defn get-input [game screen]
   (assoc game :input (s/get-key-blocking screen)))
-
-
-; Drawing ---------------------------------------------------------------------
-(defmulti draw-ui
-  (fn [ui game screen]
-    (:kind ui)))
-
-(defmethod draw-ui :start [ui game screen]
-  (s/put-string screen 0 0 "Welcome to the Caves of Clojure!")
-  (s/put-string screen 0 1 "Press enter to win, anything else to lose."))
-
-(defmethod draw-ui :win [ui game screen]
-  (s/put-string screen 0 0 "Congratulations, you win!")
-  (s/put-string screen 0 1 "Press escape to exit, anything else to restart."))
-
-(defmethod draw-ui :lose [ui game screen]
-  (s/put-string screen 0 0 "Sorry, better luck next time.")
-  (s/put-string screen 0 1 "Press escape to exit, anything else to go."))
-
-(defn draw-game [game screen]
-  (clear-screen screen)
-  (doseq [ui (:uis game)]
-    (draw-ui ui game screen))
-  (s/redraw screen))
 
 
 ; Main ------------------------------------------------------------------------
