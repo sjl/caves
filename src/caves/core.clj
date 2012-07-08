@@ -16,20 +16,20 @@
 
 ; Input -----------------------------------------------------------------------
 (defmulti process-input
-  (fn [ui input game]
-    (:kind ui)))
+  (fn [game input]
+    (:kind (last (:uis game)))))
 
-(defmethod process-input :start [ui input game]
+(defmethod process-input :start [game input]
   (if (= input :enter)
     (assoc game :uis [(new UI :win)])
     (assoc game :uis [(new UI :lose)])))
 
-(defmethod process-input :win [ui input game]
+(defmethod process-input :win [game input]
   (if (= input :escape)
     (assoc game :uis [])
     (assoc game :uis [(new UI :start)])))
 
-(defmethod process-input :lose [ui input game]
+(defmethod process-input :lose [game input]
   (if (= input :escape)
     (assoc game :uis [])
     (assoc game :uis [(new UI :start)])))
@@ -69,7 +69,7 @@
       (draw-game game screen)
       (if (nil? input)
         (recur (get-input game screen))
-        (recur (process-input (last uis) input (dissoc game :input)))))))
+        (recur (process-input (dissoc game :input) input))))))
 
 (defn new-game []
   (new Game
@@ -77,11 +77,16 @@
        [(new UI :start)]
        nil))
 
-(defn main [screen-type]
-  (future
-    (let [screen (s/get-screen screen-type)]
-      (s/in-screen screen
-                   (run-game (new-game) screen)))))
+(defn main
+  ([screen-type] (main screen-type false))
+  ([screen-type block?]
+   (letfn [(go []
+             (let [screen (s/get-screen screen-type)]
+               (s/in-screen screen
+                            (run-game (new-game) screen))))]
+     (if block?
+       (go)
+       (future (go))))))
 
 
 (defn -main [& args]
@@ -90,8 +95,4 @@
                       (args ":swing") :swing
                       (args ":text")  :text
                       :else           :auto)]
-    (main screen-type)))
-
-
-(comment
-  (main :swing))
+    (main screen-type true)))
