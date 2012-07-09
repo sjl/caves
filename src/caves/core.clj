@@ -38,6 +38,7 @@
   (s/put-string screen 0 0 "Sorry, better luck next time.")
   (s/put-string screen 0 1 "Press escape to exit, anything else to restart."))
 
+
 (defn get-viewport-coords [game vcols vrows]
   (let [location (:location game)
         [center-x center-y] location
@@ -47,8 +48,11 @@
         map-rows (count tiles)
         map-cols (count (first tiles))
 
-        start-x (max 0 (- center-x (int (/ vcols 2))))
-        start-y (max 0 (- center-y (int (/ vrows 2))))
+        start-x (- center-x (int (/ vcols 2)))
+        start-x (max 0 start-x)
+
+        start-y (- center-y (int (/ vrows 2)))
+        start-y (max 0 start-y)
 
         end-x (+ start-x vcols)
         end-x (min end-x map-cols)
@@ -60,6 +64,21 @@
         start-y (- end-y vrows)]
     [start-x start-y end-x end-y]))
 
+(defn draw-crosshairs [screen vcols vrows]
+  (let [crosshair-x (int (/ vcols 2))
+          crosshair-y (int (/ vrows 2))]
+      (s/put-string screen crosshair-x crosshair-y "X" {:fg :red})
+      (s/move-cursor screen crosshair-x crosshair-y)))
+
+(defn draw-world [screen vrows vcols start-x start-y end-x end-y tiles]
+  (doseq [[vrow-idx mrow-idx] (map vector
+                                   (range 0 vrows)
+                                   (range start-y end-y))
+          :let [row-tiles (subvec (tiles mrow-idx) start-x end-x)]]
+    (doseq [vcol-idx (range vcols)
+            :let [{:keys [glyph color]} (row-tiles vcol-idx)]]
+      (s/put-string screen vcol-idx vrow-idx glyph {:fg color}))))
+
 (defmethod draw-ui :play [ui game screen]
   (let [world (:world game)
         tiles (:tiles world)
@@ -67,17 +86,9 @@
         vcols cols
         vrows (dec rows)
         [start-x start-y end-x end-y] (get-viewport-coords game vcols vrows)]
-    (doseq [[vrow-idx mrow-idx] (map vector
-                                     (range 0 vrows)
-                                     (range start-y end-y))
-            :let [row-tiles (subvec (tiles mrow-idx) start-x end-x)]]
-      (doseq [vcol-idx (range vcols)
-              :let [{:keys [glyph color]} (row-tiles vcol-idx)]]
-        (s/put-string screen vcol-idx vrow-idx glyph {:fg color})))
-    (let [crosshair-x (int (/ vcols 2))
-          crosshair-y (int (/ vrows 2))]
-      (s/put-string screen crosshair-x crosshair-y "X" {:fg :red})
-      (s/move-cursor screen crosshair-x crosshair-y))))
+    (draw-world screen vrows vcols start-x start-y end-x end-y tiles)
+    (draw-crosshairs screen vcols vrows)))
+
 
 (defn draw-game [game screen]
   (clear-screen screen)
@@ -103,7 +114,7 @@
 (defmethod process-input :play [game input]
   (case input
     :enter     (assoc game :uis [(new UI :win)])
-    :backspace (assoc game :uis [(new UI :win)])
+    :backspace (assoc game :uis [(new UI :lose)])
     \q         (assoc game :uis [])
 
     \s (assoc game :world (smooth-world (:world game)))
