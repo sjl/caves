@@ -9,9 +9,9 @@
 (defrecord Tile [kind glyph color])
 
 (def tiles
-  {:floor (new Tile :floor "." :white)
-   :wall  (new Tile :wall  "#" :white)
-   :bound (new Tile :bound "X" :black)})
+  {:floor (->Tile :floor "." :white)
+   :wall  (->Tile :wall  "#" :white)
+   :bound (->Tile :bound "X" :black)})
 
 (defn get-tile [tiles x y]
   (get-in tiles [y x] (:bound tiles)))
@@ -69,7 +69,7 @@
 
 
 (defn random-world []
-  (let [world (new World (random-tiles))
+  (let [world (->World (random-tiles))
         world (nth (iterate smooth-world world) 0)]
     world))
 
