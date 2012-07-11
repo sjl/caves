@@ -18,8 +18,7 @@
         (recur (process-input (dissoc game :input) input))))))
 
 (defn new-game []
-  (assoc (->Game nil [(->UI :start)] nil)
-         :location [40 20]))
+  (->Game nil [(->UI :start)] nil))
 
 (defn main
   ([screen-type] (main screen-type false))

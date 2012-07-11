@@ -16,6 +16,9 @@
 (defn get-tile [tiles x y]
   (get-in tiles [y x] (:bound tiles)))
 
+(defn set-tile-floor [world x y]
+  (assoc-in world [:tiles y x] (:floor tiles)))
+
 
 ; Debugging -------------------------------------------------------------------
 (defn print-row [row]
@@ -70,6 +73,23 @@
 
 (defn random-world []
   (let [world (->World (random-tiles))
-        world (nth (iterate smooth-world world) 0)]
+        world (nth (iterate smooth-world world) 3)]
     world))
+
+
+; Querying a world ------------------------------------------------------------
+(defn random-coordinate []
+  (let [[cols rows] world-size]
+    [(rand-int cols) (rand-int rows)]))
+
+(defn find-empty-tile [world]
+  (loop [[x y] (random-coordinate)]
+    (let [{:keys [kind]} (get-tile (:tiles world) x y)]
+      (if (#{:floor} kind)
+        [x y]
+        (recur (random-coordinate))))))
+
+
+(defn get-tile-kind [world x y]
+  (:kind (get-tile (:tiles world) x y)))
 
