@@ -13,11 +13,14 @@
    :wall  (->Tile :wall  "#" :white)
    :bound (->Tile :bound "X" :black)})
 
-(defn get-tile [tiles x y]
+
+; Convenience functions -------------------------------------------------------
+(defn get-tile-from-tiles [tiles [x y]]
   (get-in tiles [y x] (:bound tiles)))
 
-(defn set-tile-floor [world x y]
-  (assoc-in world [:tiles y x] (:floor tiles)))
+(defn random-coordinate []
+  (let [[cols rows] world-size]
+    [(rand-int cols) (rand-int rows)]))
 
 
 ; Debugging -------------------------------------------------------------------
@@ -53,8 +56,7 @@
     [(+ x dx) (+ y dy)]))
 
 (defn get-block [tiles x y]
-  (map (fn [[x y]]
-         (get-tile tiles x y))
+  (map (partial get-tile-from-tiles tiles)
        (block-coords x y)))
 
 (defn get-smoothed-row [tiles y]
@@ -78,18 +80,23 @@
 
 
 ; Querying a world ------------------------------------------------------------
-(defn random-coordinate []
-  (let [[cols rows] world-size]
-    [(rand-int cols) (rand-int rows)]))
+(defn get-tile [world coord]
+  (get-tile-from-tiles (:tiles world) coord))
+
+(defn get-tile-kind [world coord]
+  (:kind (get-tile world coord)))
+
+(defn set-tile [world [x y] tile]
+  (assoc-in world [:tiles y x] tile))
+
+(defn set-tile-floor [world coord]
+  (set-tile world coord (:floor tiles)))
+
 
 (defn find-empty-tile [world]
-  (loop [[x y] (random-coordinate)]
-    (let [{:keys [kind]} (get-tile (:tiles world) x y)]
+  (loop [coord (random-coordinate)]
+    (let [{:keys [kind]} (get-tile world coord)]
       (if (#{:floor} kind)
-        [x y]
+        coord
         (recur (random-coordinate))))))
-
-
-(defn get-tile-kind [world x y]
-  (:kind (get-tile (:tiles world) x y)))
 
