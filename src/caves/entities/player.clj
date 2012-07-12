@@ -3,7 +3,7 @@
         [caves.entities.aspects.mobile :only [Mobile move can-move?]]
         [caves.entities.aspects.digger :only [Digger dig can-dig?]]
         [caves.coords :only [destination-coords]]
-        [caves.world :only [get-tile-kind set-tile-floor]]))
+        [caves.world :only [is-empty? get-tile-kind set-tile-floor]]))
 
 
 (defrecord Player [id glyph color location])
@@ -23,7 +23,7 @@
     {:pre [(can-move? this world dest)]}
     (assoc-in world [:entities :player :location] dest))
   (can-move? [this world dest]
-    (check-tile world dest #{:floor})))
+    (is-empty? world dest)))
 
 (extend-type Player Digger
   (dig [this world dest]
