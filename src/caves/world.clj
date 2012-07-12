@@ -23,14 +23,6 @@
     [(rand-int cols) (rand-int rows)]))
 
 
-; Debugging -------------------------------------------------------------------
-(defn print-row [row]
-  (println (apply str (map :glyph row))))
-
-(defn print-world [world]
-  (dorun (map print-row (:tiles world))))
-
-
 ; World generation ------------------------------------------------------------
 (defn random-tiles []
   (let [[cols rows] world-size]
@@ -95,8 +87,7 @@
 
 (defn find-empty-tile [world]
   (loop [coord (random-coordinate)]
-    (let [{:keys [kind]} (get-tile world coord)]
-      (if (#{:floor} kind)
-        coord
-        (recur (random-coordinate))))))
+    (if (#{:floor} (get-tile-kind world coord))
+      coord
+      (recur (random-coordinate)))))
 

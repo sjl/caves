@@ -5,16 +5,20 @@
   (:require [lanterna.screen :as s]))
 
 
-(defmulti process-input
-  (fn [game input]
-    (:kind (last (:uis game)))))
-
-(defmethod process-input :start [game input]
+(defn reset-game [game]
   (let [fresh-world (random-world)]
     (-> game
       (assoc :world fresh-world)
       (assoc-in [:world :player] (make-player fresh-world))
       (assoc :uis [(->UI :play)]))))
+
+
+(defmulti process-input
+  (fn [game input]
+    (:kind (last (:uis game)))))
+
+(defmethod process-input :start [game input]
+  (reset-game game))
 
 
 (defmethod process-input :play [game input]
