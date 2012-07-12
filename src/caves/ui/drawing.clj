@@ -60,17 +60,16 @@
 
 (defn draw-hud [screen game start-x start-y]
   (let [hud-row (dec (second screen-size))
-        [x y] (get-in game [:world :player :location])
+        [x y] (get-in game [:world :entities :player :location])
         info (str "loc: [" x "-" y "]")
         info (str info " start: [" start-x "-" start-y "]")]
     (s/put-string screen 0 hud-row info)))
 
-(defn draw-player [screen start-x start-y player]
-  (let [[player-x player-y] (:location player)
-        x (- player-x start-x)
-        y (- player-y start-y)]
-      (s/put-string screen x y (:glyph player) {:fg :white})
-      (s/move-cursor screen x y)))
+(defn draw-entity [screen start-x start-y {:keys [location glyph color]}]
+  (let [[entity-x entity-y] location
+        x (- entity-x start-x)
+        y (- entity-y start-y)]
+      (s/put-string screen x y glyph {:fg color})))
 
 (defn draw-world [screen vrows vcols start-x start-y end-x end-y tiles]
   (doseq [[vrow-idx mrow-idx] (map vector
@@ -81,16 +80,25 @@
             :let [{:keys [glyph color]} (row-tiles vcol-idx)]]
       (s/put-string screen vcol-idx vrow-idx glyph {:fg color}))))
 
+(defn highlight-player [screen start-x start-y player]
+  (let [[player-x player-y] (:location player)
+        x (- player-x start-x)
+        y (- player-y start-y)]
+    (s/move-cursor screen x y)))
+
 (defmethod draw-ui :play [ui game screen]
   (let [world (:world game)
-        {:keys [tiles player]} world
+        {:keys [tiles entities]} world
+        player (:player entities)
         [cols rows] screen-size
         vcols cols
         vrows (dec rows)
         [start-x start-y end-x end-y] (get-viewport-coords game (:location player) vcols vrows)]
     (draw-world screen vrows vcols start-x start-y end-x end-y tiles)
-    (draw-player screen start-x start-y player)
-    (draw-hud screen game start-x start-y)))
+    (doseq [entity (vals entities)]
+      (draw-entity screen start-x start-y entity))
+    (draw-hud screen game start-x start-y)
+    (highlight-player screen start-x start-y player)))
 
 
 (defn draw-game [game screen]

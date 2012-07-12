@@ -1,15 +1,26 @@
 (ns caves.ui.input
-  (:use [caves.world :only [random-world smooth-world]]
+  (:use [caves.world :only [random-world smooth-world find-empty-tile]]
         [caves.ui.core :only [->UI]]
-        [caves.entities.player :only [move-player make-player]])
+        [caves.entities.player :only [move-player make-player]]
+        [caves.entities.lichen :only [make-lichen]])
   (:require [lanterna.screen :as s]))
 
+
+(defn add-lichen [world]
+  (let [{:as lichen :keys [id]} (make-lichen (find-empty-tile world))]
+    (assoc-in world [:entities id] lichen)))
+
+(defn populate-world [world]
+  (let [world (assoc-in world [:entities :player]
+                        (make-player (find-empty-tile world)))
+        world (nth (iterate add-lichen world) 30)]
+    world))
 
 (defn reset-game [game]
   (let [fresh-world (random-world)]
     (-> game
       (assoc :world fresh-world)
-      (assoc-in [:world :player] (make-player fresh-world))
+      (update-in [:world] populate-world)
       (assoc :uis [(->UI :play)]))))
 
 

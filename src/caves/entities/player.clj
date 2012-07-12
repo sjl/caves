@@ -3,10 +3,10 @@
         [caves.entities.aspects.mobile :only [Mobile move can-move?]]
         [caves.entities.aspects.digger :only [Digger dig can-dig?]]
         [caves.coords :only [destination-coords]]
-        [caves.world :only [find-empty-tile get-tile-kind set-tile-floor]]))
+        [caves.world :only [get-tile-kind set-tile-floor]]))
 
 
-(defrecord Player [id glyph location])
+(defrecord Player [id glyph color location])
 
 (defn check-tile
   "Check that the tile at the destination passes the given predicate."
@@ -21,7 +21,7 @@
 (extend-type Player Mobile
   (move [this world dest]
     {:pre [(can-move? this world dest)]}
-    (assoc-in world [:player :location] dest))
+    (assoc-in world [:entities :player :location] dest))
   (can-move? [this world dest]
     (check-tile world dest #{:floor})))
 
@@ -33,11 +33,12 @@
     (check-tile world dest #{:wall})))
 
 
-(defn make-player [world]
-  (->Player :player "@" (find-empty-tile world)))
+
+(defn make-player [location]
+  (->Player :player "@" :white location))
 
 (defn move-player [world dir]
-  (let [player (:player world)
+  (let [player (get-in world [:entities :player])
         target (destination-coords (:location player) dir)]
     (cond
       (can-move? player world target) (move player world target)
