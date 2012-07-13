@@ -10,7 +10,7 @@
   (->Lichen (get-id) "F" :green location 1))
 
 (defn should-grow []
-  (< (rand) 0.01))
+  (< (rand) (/ 1 500)))
 
 (defn grow [lichen world]
   (if-let [target (find-empty-neighbor world (:location lichen))]
