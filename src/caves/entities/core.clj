@@ -1,7 +1,7 @@
 (ns caves.entities.core)
 
 
-(def ids (ref 0))
+(def ids (atom 0))
 
 (defprotocol Entity
   (tick [this world]
@@ -9,10 +9,7 @@
 
 
 (defn get-id []
-  (dosync
-    (let [id @ids]
-      (alter ids inc)
-      id)))
+  (swap! ids inc))
 
 
 (defn make-fnmap
