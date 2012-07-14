@@ -1,9 +1,13 @@
-(ns caves.entities.aspects.mobile)
+(ns caves.entities.aspects.mobile
+  (:use [caves.entities.core :only [defaspect]]
+        [caves.world :only [is-empty?]]))
 
 
-(defprotocol Mobile
+
+(defaspect Mobile
   (move [this world dest]
-        "Move this entity to a new location.")
+    {:pre [(can-move? this world dest)]}
+    (assoc-in world [:entities (:id this) :location] dest))
   (can-move? [this world dest]
-             "Return whether the entity can move to the new location."))
+    (is-empty? world dest)))
 

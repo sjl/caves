@@ -1,4 +1,5 @@
-(ns caves.entities.aspects.attacker)
+(ns caves.entities.aspects.attacker
+  (:use [caves.entities.core :only [defaspect]]))
 
 
 (defprotocol Attacker
