@@ -28,6 +28,7 @@
   (->Game nil [(->UI :start)] nil))
 
 (defn main
+  ([] (main :swing false))
   ([screen-type] (main screen-type false))
   ([screen-type block?]
    (letfn [(go []
