@@ -32,6 +32,21 @@
 
 
 ; Play ------------------------------------------------------------------------
+;
+; The Play UI draws the world.  This is tricky, but hopefully not too bad.
+;
+; Imagine a 10 by 4 world with a 3 by 2 "viewport":
+;
+;  0123456789
+; 0...OVV....
+; 1...VVV....
+; 2...VVV....
+; 3..........
+; 4..........
+;
+; The V is the viewport, and the O is the "viewport origin", which would be
+; [3 0] in terms of the map's coordinates.
+
 (defn get-viewport-coords
   "Find the top-left coordinates of the viewport in the overall map, centering on the player."
   [game player-location vcols vrows]
@@ -67,7 +82,7 @@
 (defn draw-hud [screen game [ox oy]]
   (let [hud-row (dec (second (s/get-size screen)))
         [x y] (get-in game [:world :entities :player :location])
-        info (str "loc: [" x "-" y "]")
+        info (str "player loc: [" x "-" y "]")
         info (str info " viewport origin: [" ox "-" oy "]")]
     (s/put-string screen 0 hud-row info)))
 
