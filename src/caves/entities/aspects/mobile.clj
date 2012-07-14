@@ -3,7 +3,6 @@
         [caves.world :only [is-empty?]]))
 
 
-
 (defaspect Mobile
   (move [this world dest]
     {:pre [(can-move? this world dest)]}

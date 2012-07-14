@@ -1,8 +1,11 @@
 (ns caves.entities.aspects.attacker
-  (:use [caves.entities.core :only [defaspect]]))
+  (:use [caves.entities.aspects.destructible :only [Destructible take-damage]]
+        [caves.entities.core :only [defaspect]]))
 
 
-(defprotocol Attacker
+(defaspect Attacker
   (attack [this world target]
-          "Attack the target."))
+    {:pre [(satisfies? Destructible target)]}
+    (let [damage 1]
+      (take-damage target world damage))))
 

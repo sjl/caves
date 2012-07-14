@@ -105,3 +105,9 @@
     (when (seq candidates)
       (rand-nth candidates))))
 
+
+(defn check-tile
+  "Check that the tile at the destination passes the given predicate."
+  [world dest pred]
+  (pred (get-tile-kind world dest)))
+
