@@ -1,6 +1,6 @@
 (ns caves.entities.lichen
   (:use [caves.entities.core :only [Entity get-id add-aspect]]
-        [caves.entities.aspects.destructible :only [Destructible take-damage]]
+        [caves.entities.aspects.destructible :only [Destructible]]
         [caves.world :only [find-empty-neighbor]]))
 
 

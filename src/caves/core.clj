@@ -20,9 +20,9 @@
   (loop [{:keys [input uis] :as game} game]
     (when (seq uis)
       (if (nil? input)
-        (do
+        (let [game (update-in game [:world] tick-all)]
           (draw-game game screen)
-          (recur (get-input (update-in game [:world] tick-all) screen)))
+          (recur (get-input game screen)))
         (recur (process-input (dissoc game :input) input))))))
 
 (defn new-game []
