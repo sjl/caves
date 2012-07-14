@@ -18,7 +18,7 @@
 
 (defn run-game [game screen]
   (loop [{:keys [input uis] :as game} game]
-    (when-not (empty? uis)
+    (when (seq uis)
       (if (nil? input)
         (do
           (draw-game game screen)

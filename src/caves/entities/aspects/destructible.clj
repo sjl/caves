@@ -7,4 +7,4 @@
     (let [damaged-this (update-in this [:hp] - damage)]
       (if-not (pos? (:hp damaged-this))
         (update-in world [:entities] dissoc id)
-        (update-in world [:entities id] assoc damaged-this)))))
+        (assoc-in world [:entities id] damaged-this)))))
