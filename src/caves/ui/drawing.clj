@@ -59,35 +59,34 @@
     [start-x start-y]))
 
 (defn get-viewport-coords-of
-  "Get the viewport coordiates for the given real coords, given the viewport start coords."
-  [start-x start-y coords]
-  (let [[cx cy] coords]
-    [(- cx start-x) (- cy start-y)]))
+  "Get the viewport coordiates for the given real coords, given the viewport origin."
+  [origin coords]
+  (map - coords origin))
 
 
-(defn draw-hud [screen game start-x start-y]
+(defn draw-hud [screen game [ox oy]]
   (let [hud-row (dec (second (s/get-size screen)))
         [x y] (get-in game [:world :entities :player :location])
         info (str "loc: [" x "-" y "]")
-        info (str info " start: [" start-x "-" start-y "]")]
+        info (str info " viewport origin: [" ox "-" oy "]")]
     (s/put-string screen 0 hud-row info)))
 
 
-(defn draw-entity [screen start-x start-y {:keys [location glyph color]}]
-  (let [[x y] (get-viewport-coords-of start-x start-y location)]
+(defn draw-entity [screen origin {:keys [location glyph color]}]
+  (let [[x y] (get-viewport-coords-of origin location)]
     (s/put-string screen x y glyph {:fg color})))
 
 
-(defn draw-world [screen vrows vcols start-x start-y tiles]
+(defn draw-world [screen vrows vcols [ox oy] tiles]
   (letfn [(render-tile [tile]
             [(:glyph tile) {:fg (:color tile)}])]
-    (let [tiles (shear tiles start-x start-y vcols vrows)
+    (let [tiles (shear tiles ox oy vcols vrows)
           sheet (map2d render-tile tiles)]
       (s/put-sheet screen 0 0 sheet))))
 
 
-(defn highlight-player [screen start-x start-y player]
-  (let [[x y] (get-viewport-coords-of start-x start-y (:location player))]
+(defn highlight-player [screen origin player]
+  (let [[x y] (get-viewport-coords-of origin (:location player))]
     (s/move-cursor screen x y)))
 
 
@@ -98,12 +97,12 @@
         [cols rows] (s/get-size screen)
         vcols cols
         vrows (dec rows)
-        [start-x start-y] (get-viewport-coords game (:location player) vcols vrows)]
-    (draw-world screen vrows vcols start-x start-y tiles)
+        origin (get-viewport-coords game (:location player) vcols vrows)]
+    (draw-world screen vrows vcols origin tiles)
     (doseq [entity (vals entities)]
-      (draw-entity screen start-x start-y entity))
-    (draw-hud screen game start-x start-y)
-    (highlight-player screen start-x start-y player)))
+      (draw-entity screen origin entity))
+    (draw-hud screen game origin)
+    (highlight-player screen origin player)))
 
 
 ; Entire Game -----------------------------------------------------------------
