@@ -23,7 +23,7 @@
     (-> world
       (add-creatures make-lichen 30)
       (add-creatures make-bunny 20)
-      (add-creatures make-silverfish 15))))
+      (add-creatures make-silverfish 4))))
 
 (defn reset-game [game]
   (let [fresh-world (random-world)]

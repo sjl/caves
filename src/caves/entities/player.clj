@@ -3,11 +3,12 @@
         [caves.entities.aspects.mobile :only [Mobile move can-move?]]
         [caves.entities.aspects.digger :only [Digger dig can-dig?]]
         [caves.entities.aspects.attacker :only [Attacker attack]]
+        [caves.entities.aspects.destructible :only [Destructible]]
         [caves.coords :only [destination-coords]]
         [caves.world :only [get-entity-at]]))
 
 
-(defrecord Player [id glyph color location])
+(defrecord Player [id glyph color location hp max-hp attack])
 
 (extend-type Player Entity
   (tick [this world]
@@ -16,9 +17,16 @@
 (add-aspect Player Mobile)
 (add-aspect Player Digger)
 (add-aspect Player Attacker)
+(add-aspect Player Destructible)
 
 (defn make-player [location]
-  (->Player :player "@" :white location))
+  (map->Player {:id :player
+                :glyph "@"
+                :color :white
+                :location location
+                :hp 40
+                :max-hp 40
+                :attack 10}))
 
 (defn move-player [world dir]
   (let [player (get-in world [:entities :player])

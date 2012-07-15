@@ -4,10 +4,15 @@
         [caves.world :only [find-empty-neighbor]]))
 
 
-(defrecord Lichen [id glyph color location hp])
+(defrecord Lichen [id glyph color location hp max-hp])
 
 (defn make-lichen [location]
-  (->Lichen (get-id) "F" :green location 1))
+  (map->Lichen {:id (get-id)
+                :glyph "F"
+                :color :green
+                :location location
+                :hp 6
+                :max-hp 6}))
 
 (defn should-grow []
   (< (rand) (/ 1 500)))
