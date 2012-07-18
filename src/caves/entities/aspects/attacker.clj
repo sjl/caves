@@ -1,5 +1,6 @@
 (ns caves.entities.aspects.attacker
-  (:use [caves.entities.aspects.destructible :only [Destructible take-damage
+  (:use [caves.entities.aspects.receiver :only [send-message]]
+        [caves.entities.aspects.destructible :only [Destructible take-damage
                                                     defense-value]]
         [caves.entities.core :only [defaspect]]))
 
@@ -9,7 +10,13 @@
 (defaspect Attacker
   (attack [this target world]
     {:pre [(satisfies? Destructible target)]}
-    (take-damage target (get-damage this target world) world))
+    (let [damage (get-damage this target world)]
+      (->> world
+        (take-damage target damage)
+        (send-message this "You strike the %s for %d damage!"
+                      [(:glyph target) damage])
+        (send-message target "The %s strikes you for %d damage!"
+                      [(:glyph target) damage]))))
   (attack-value [this world]
     (get this :attack 1)))
 

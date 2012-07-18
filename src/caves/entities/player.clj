@@ -1,5 +1,6 @@
 (ns caves.entities.player
   (:use [caves.entities.core :only [Entity add-aspect]]
+        [caves.entities.aspects.receiver :only [Receiver]]
         [caves.entities.aspects.mobile :only [Mobile move can-move?]]
         [caves.entities.aspects.digger :only [Digger dig can-dig?]]
         [caves.entities.aspects.attacker :only [Attacker attack]]
@@ -18,6 +19,7 @@
 (add-aspect Player Digger)
 (add-aspect Player Attacker)
 (add-aspect Player Destructible)
+(add-aspect Player Receiver)
 
 (defn make-player [location]
   (map->Player {:id :player

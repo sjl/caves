@@ -16,12 +16,17 @@
 (defn tick-all [world]
   (reduce tick-entity world (vals (:entities world))))
 
+(defn clear-messages [game]
+  (assoc-in game [:world :entities :player :messages] nil))
+
+
 (defn run-game [game screen]
   (loop [{:keys [input uis] :as game} game]
     (when (seq uis)
       (if (nil? input)
-        (let [game (update-in game [:world] tick-all)]
-          (draw-game game screen)
+        (let [game (update-in game [:world] tick-all)
+              _ (draw-game game screen)
+              game (clear-messages game)]
           (recur (get-input game screen)))
         (recur (process-input (dissoc game :input) input))))))
 

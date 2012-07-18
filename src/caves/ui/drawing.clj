@@ -107,6 +107,11 @@
     (s/move-cursor screen x y)))
 
 
+(defn draw-messages [screen messages]
+  (when (seq messages)
+    (s/put-sheet screen 0 0 messages)))
+
+
 (defmethod draw-ui :play [ui game screen]
   (let [world (:world game)
         {:keys [tiles entities]} world
@@ -119,6 +124,7 @@
     (doseq [entity (vals entities)]
       (draw-entity screen origin entity))
     (draw-hud screen game)
+    (draw-messages screen (:messages player))
     (highlight-player screen origin player)))
 
 
