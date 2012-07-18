@@ -1,5 +1,5 @@
 (ns caves.world
-  (:use [caves.coords :only [neighbors]]))
+  (:use [caves.coords :only [neighbors radial-distance]]))
 
 
 ; Constants -------------------------------------------------------------------
@@ -86,9 +86,19 @@
   (set-tile world coord (:floor tiles)))
 
 
+(defn get-entities-at [world coord]
+  (filter #(= coord (:location %))
+          (vals (:entities world))))
+
 (defn get-entity-at [world coord]
-  (first (filter #(= coord (:location %))
-                 (vals (:entities world)))))
+  (first (get-entities-at world coord)))
+
+(defn get-entities-around
+  ([world coord] (get-entities-around world coord 1))
+  ([world coord radius]
+     (filter #(<= (radial-distance coord (:location %))
+                  radius)
+             (vals (:entities world)))))
 
 (defn is-empty? [world coord]
   (and (#{:floor} (get-tile-kind world coord))

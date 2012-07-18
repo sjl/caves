@@ -1,5 +1,6 @@
 (ns caves.entities.lichen
   (:use [caves.entities.core :only [Entity get-id add-aspect]]
+        [caves.entities.aspects.receiver :only [send-message-nearby]]
         [caves.entities.aspects.destructible :only [Destructible]]
         [caves.world :only [find-empty-neighbor]]))
 
@@ -17,10 +18,12 @@
 (defn should-grow []
   (< (rand) (/ 1 500)))
 
-(defn grow [lichen world]
-  (if-let [target (find-empty-neighbor world (:location lichen))]
-    (let [new-lichen (make-lichen target)]
-      (assoc-in world [:entities (:id new-lichen)] new-lichen))
+(defn grow [{:keys [location]} world]
+  (if-let [target (find-empty-neighbor world location)]
+    (let [new-lichen (make-lichen target)
+          world (assoc-in world [:entities (:id new-lichen)] new-lichen)
+          world (send-message-nearby location "The lichen grows." world)]
+      world)
     world))
 
 

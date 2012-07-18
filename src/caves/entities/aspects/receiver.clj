@@ -1,5 +1,6 @@
 (ns caves.entities.aspects.receiver
-  (:use [caves.entities.core :only [defaspect]]))
+  (:use [caves.entities.core :only [defaspect]]
+        [caves.world :only [get-entities-around]]))
 
 
 (defaspect Receiver
@@ -11,4 +12,10 @@
   (if (satisfies? Receiver entity)
     (receive-message entity (apply format message args) world)
     world))
+
+(defn send-message-nearby [coord message world]
+  (let [entities (get-entities-around world coord 7)
+        sm #(send-message %2 message [] %1)]
+    (reduce sm world entities)))
+
 

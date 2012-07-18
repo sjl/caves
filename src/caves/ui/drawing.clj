@@ -1,5 +1,5 @@
 (ns caves.ui.drawing
-  (:use [caves.utils :only (map2d shear)])
+  (:use [caves.utils :only (map2d shear enumerate)])
   (:require [lanterna.screen :as s]))
 
 
@@ -108,8 +108,8 @@
 
 
 (defn draw-messages [screen messages]
-  (when (seq messages)
-    (s/put-sheet screen 0 0 messages)))
+  (doseq [[i msg] (enumerate messages)]
+    (s/put-string screen 0 i msg {:fg :black :bg :white})))
 
 
 (defmethod draw-ui :play [ui game screen]
