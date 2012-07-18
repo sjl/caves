@@ -22,10 +22,10 @@
     (let [target (rand-nth (neighbors (:location this)))]
       (if (get-entity-at world target)
         world
-        (move this world target)))))
+        (move this target world)))))
 
 (add-aspect Silverfish Mobile
-  (can-move? [this world dest]
+  (can-move? [this dest world]
     (not (get-entity-at world dest))))
 
 (add-aspect Silverfish Destructible)

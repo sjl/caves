@@ -3,7 +3,7 @@
 
 
 (defaspect Destructible
-  (take-damage [{:keys [id] :as this} world damage]
+  (take-damage [{:keys [id] :as this} damage world]
     (let [damaged-this (update-in this [:hp] - damage)]
       (if-not (pos? (:hp damaged-this))
         (update-in world [:entities] dissoc id)

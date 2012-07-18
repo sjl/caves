@@ -8,6 +8,6 @@
                  ]
 
   ; :repositories {"sonatype-snapshots" "https://oss.sonatype.org/content/repositories/snapshots"}
-  ; :main caves.core
+  :main ^{:skip-aot true} caves.core
 
   )

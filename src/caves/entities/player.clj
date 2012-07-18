@@ -33,7 +33,7 @@
         target (destination-coords (:location player) dir)
         entity-at-target (get-entity-at world target)]
     (cond
-      entity-at-target (attack player world entity-at-target)
-      (can-move? player world target) (move player world target)
-      (can-dig? player world target) (dig player world target)
+      entity-at-target (attack player entity-at-target world)
+      (can-move? player target world) (move player target world)
+      (can-dig? player target world) (dig player target world)
       :else world)))
