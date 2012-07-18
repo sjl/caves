@@ -9,7 +9,7 @@
         [caves.world :only [get-entity-at]]))
 
 
-(defrecord Player [id glyph color location hp max-hp attack])
+(defrecord Player [id glyph color location hp max-hp attack name])
 
 (extend-type Player Entity
   (tick [this world]
@@ -23,6 +23,7 @@
 
 (defn make-player [location]
   (map->Player {:id :player
+                :name "player"
                 :glyph "@"
                 :color :white
                 :location location

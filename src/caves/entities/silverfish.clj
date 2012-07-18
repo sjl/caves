@@ -6,10 +6,11 @@
         [caves.coords :only [neighbors]]))
 
 
-(defrecord Silverfish [id glyph color location hp max-hp])
+(defrecord Silverfish [id glyph color location hp max-hp name])
 
 (defn make-silverfish [location]
   (map->Silverfish {:id (get-id)
+                    :name "silverfish"
                     :glyph "~"
                     :color :white
                     :location location

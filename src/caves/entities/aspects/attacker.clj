@@ -14,9 +14,9 @@
       (->> world
         (take-damage target damage)
         (send-message this "You strike the %s for %d damage!"
-                      [(:glyph target) damage])
+                      [(:name target) damage])
         (send-message target "The %s strikes you for %d damage!"
-                      [(:glyph target) damage]))))
+                      [(:name target) damage]))))
   (attack-value [this world]
     (get this :attack 1)))
 

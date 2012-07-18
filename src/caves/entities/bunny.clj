@@ -5,10 +5,11 @@
         [caves.world :only [find-empty-neighbor]]))
 
 
-(defrecord Bunny [id glyph color location hp max-hp])
+(defrecord Bunny [id glyph color location hp max-hp name])
 
 (defn make-bunny [location]
   (map->Bunny {:id (get-id)
+               :name "bunny"
                :glyph "v"
                :color :yellow
                :location location
