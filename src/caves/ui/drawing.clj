@@ -89,9 +89,13 @@
     (s/put-string screen 0 hud-row info)))
 
 
-(defn draw-entity [screen origin {:keys [location glyph color]}]
-  (let [[x y] (get-viewport-coords-of origin location)]
-    (s/put-string screen x y glyph {:fg color})))
+(defn draw-entity [screen origin vrows vcols {:keys [location glyph color]}]
+  (let [[x y] (get-viewport-coords-of origin location)
+        max-x (dec vcols)
+        max-y (dec vrows)]
+    (when (and (<= 0 x max-x)
+               (<= 0 y max-y))
+      (s/put-string screen x y glyph {:fg color}))))
 
 
 (defn draw-world [screen vrows vcols [ox oy] tiles]
@@ -122,7 +126,7 @@
         origin (get-viewport-coords game (:location player) vcols vrows)]
     (draw-world screen vrows vcols origin tiles)
     (doseq [entity (vals entities)]
-      (draw-entity screen origin entity))
+      (draw-entity screen origin vrows vcols entity))
     (draw-hud screen game)
     (draw-messages screen (:messages player))
     (highlight-player screen origin player)))
