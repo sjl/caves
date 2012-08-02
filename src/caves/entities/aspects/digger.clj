@@ -1,6 +1,6 @@
 (ns caves.entities.aspects.digger
   (:use [caves.entities.core :only [defaspect]]
-        [caves.world :only [check-tile set-tile-floor]]))
+        [caves.world.core :only [check-tile set-tile-floor]]))
 
 
 (defaspect Digger

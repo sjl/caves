@@ -82,7 +82,7 @@
 
   This is similar to extend-type, with two differences:
  
-  * It must be used on a protocol defined with defaspect
+  * It must be used on a protocol defined with defaspect.
   * It will use the aspect's default function implementation for any functions
     not given.
 

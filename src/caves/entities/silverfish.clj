@@ -2,7 +2,7 @@
   (:use [caves.entities.core :only [Entity get-id add-aspect]]
         [caves.entities.aspects.destructible :only [Destructible]]
         [caves.entities.aspects.mobile :only [Mobile move can-move?]]
-        [caves.world :only [get-entity-at get-tile-kind]]
+        [caves.world.core :only [get-entity-at get-tile-kind]]
         [caves.coords :only [neighbors]]))
 
 

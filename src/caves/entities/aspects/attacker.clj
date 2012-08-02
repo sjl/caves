@@ -16,7 +16,7 @@
         (send-message this "You strike the %s for %d damage!"
                       [(:name target) damage])
         (send-message target "The %s strikes you for %d damage!"
-                      [(:name target) damage]))))
+                      [(:name this) damage]))))
   (attack-value [this world]
     (get this :attack 1)))
 

@@ -1,5 +1,6 @@
 (ns caves.ui.input
-  (:use [caves.world :only [random-world smooth-world find-empty-tile]]
+  (:use [caves.world.generation :only [random-world smooth-world]]
+        [caves.world.core :only [find-empty-tile]]
         [caves.ui.core :only [->UI]]
         [caves.entities.player :only [move-player make-player]]
         [caves.entities.lichen :only [make-lichen]]

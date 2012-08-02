@@ -6,7 +6,7 @@
         [caves.entities.aspects.attacker :only [Attacker attack]]
         [caves.entities.aspects.destructible :only [Destructible]]
         [caves.coords :only [destination-coords]]
-        [caves.world :only [get-entity-at]]))
+        [caves.world.core :only [get-entity-at]]))
 
 
 (defrecord Player [id glyph color location hp max-hp attack name])
