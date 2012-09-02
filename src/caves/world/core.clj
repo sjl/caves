@@ -3,7 +3,7 @@
 
 
 ; Constants -------------------------------------------------------------------
-(def world-size [160 50])
+(def world-size [120 50])
 
 ; Data structures -------------------------------------------------------------
 (defrecord World [tiles entities])
@@ -24,6 +24,11 @@
 (defn random-coordinate []
   (let [[cols rows] world-size]
     [(rand-int cols) (rand-int rows)]))
+
+(defn tile-walkable?
+  "Return whether a (normal) entity can walk over this type of tile."
+  [tile]
+  (#{:floor :up :down} (:kind tile)))
 
 
 ; Querying a world ------------------------------------------------------------
@@ -55,7 +60,7 @@
              (vals (:entities world)))))
 
 (defn is-empty? [world coord]
-  (and (#{:floor} (get-tile-kind world coord))
+  (and (tile-walkable? (get-tile world coord))
        (not (get-entity-at world coord))))
 
 (defn find-empty-tile [world]

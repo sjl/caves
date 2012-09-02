@@ -57,6 +57,8 @@
     \b (update-in game [:world] move-player :sw)
     \n (update-in game [:world] move-player :se)
 
+    \R (update-in game [:debug-flags :show-regions] not)
+
     game))
 
 (defmethod process-input :win [game input]

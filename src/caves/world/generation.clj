@@ -1,9 +1,82 @@
 (ns caves.world.generation
-  (:use [caves.world.core :only [tiles get-tile-from-tiles random-coordinate
-                                 world-size ->World]]))
+  (:use [clojure.set :only (union difference)]
+        [caves.world.core :only [tiles get-tile-from-tiles random-coordinate
+                                 world-size ->World tile-walkable?]]
+        [caves.coords :only [neighbors]]))
 
 
+; Convenience -----------------------------------------------------------------
+(def all-coords
+  (let [[cols rows] world-size]
+    (for [x (range cols)
+          y (range rows)]
+      [x y])))
 
+(defn get-tile-from-level [level [x y]]
+  (get-in level [y x] (:bound tiles)))
+
+
+; Region Mapping --------------------------------------------------------------
+(defn filter-walkable
+  "Filter the given coordinates to include only walkable ones."
+  [level coords]
+  (set (filter #(tile-walkable? (get-tile-from-level level %))
+               coords)))
+
+
+(defn walkable-neighbors
+  "Return the neighboring coordinates walkable from the given coord."
+  [level coord]
+  (filter-walkable level (neighbors coord)))
+
+(defn walkable-from
+  "Return all coordinates walkable from the given coord (including itself)."
+  [level coord]
+  (loop [walked #{}
+         to-walk #{coord}]
+    (if (empty? to-walk)
+      walked
+      (let [current (first to-walk)
+            walked (conj walked current)
+            to-walk (disj to-walk current)
+            candidates (walkable-neighbors level current)
+            to-walk (union to-walk (difference candidates walked))]
+        (recur walked to-walk)))))
+
+
+(defn get-region-map
+  "Get a region map for the given level.
+
+  A region map is a map of coordinates to region numbers.  Unwalkable
+  coordinates will not be included in the map.  For example, the map:
+
+  .#.
+  ##.
+
+  Would have a region map of:
+
+    x y  region
+  {[0 0] 0
+   [2 0] 1
+   [2 1] 1}
+
+  "
+  [level]
+  (loop [remaining (filter-walkable level all-coords)
+         region-map {}
+         n 0]
+    (if (empty? remaining)
+      region-map
+      (let [next-coord (first remaining)
+            next-region-coords (walkable-from level next-coord)]
+        (recur (difference remaining next-region-coords)
+               (into region-map (map vector
+                                     next-region-coords
+                                     (repeat n)))
+               (inc n))))))
+
+
+; Random World Generation -----------------------------------------------------
 (defn random-tiles []
   (let [[cols rows] world-size]
     (letfn [(random-tile []
@@ -48,4 +121,4 @@
 (defn random-world []
   (let [world (->World (random-tiles) {})
         world (nth (iterate smooth-world world) 3)]
-    world))
+    (assoc world :regions (get-region-map (:tiles world)))))

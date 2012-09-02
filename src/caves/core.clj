@@ -7,7 +7,7 @@
 
 
 ; Data Structures -------------------------------------------------------------
-(defrecord Game [world uis input])
+(defrecord Game [world uis input debug-flags])
 
 ; Main ------------------------------------------------------------------------
 (defn tick-entity [world entity]
@@ -31,7 +31,7 @@
         (recur (process-input (dissoc game :input) input))))))
 
 (defn new-game []
-  (->Game nil [(->UI :start)] nil))
+  (->Game nil [(->UI :start)] nil {:show-regions false}))
 
 (defn main
   ([] (main :swing false))

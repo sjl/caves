@@ -85,7 +85,8 @@
         {:keys [location hp max-hp]} player
         [x y] location
         info (str "hp [" hp "/" max-hp "]")
-        info (str info " loc: [" x "-" y "]")]
+        info (str info " loc: [" x "-" y "]")
+        info (str info " region: [" (get-in game [:world :regions location]) "]")]
     (s/put-string screen 0 hud-row info)))
 
 
@@ -105,6 +106,19 @@
           sheet (map2d render-tile tiles)]
       (s/put-sheet screen 0 0 sheet))))
 
+(defn draw-regions [screen region-map vrows vcols [ox oy]]
+  (letfn [(get-region-glyph [region-number]
+            (str
+              (nth
+                "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                region-number)))]
+    (doseq [x (range ox (+ ox vcols))
+            y (range oy (+ oy vrows))]
+      (let [region-number (region-map [x y])]
+        (when region-number
+          (s/put-string screen (- x ox) (- y oy)
+                        (get-region-glyph region-number)
+                        {:fg :blue}))))))
 
 (defn highlight-player [screen origin player]
   (let [[x y] (get-viewport-coords-of origin (:location player))]
@@ -118,13 +132,15 @@
 
 (defmethod draw-ui :play [ui game screen]
   (let [world (:world game)
-        {:keys [tiles entities]} world
+        {:keys [tiles entities regions]} world
         player (:player entities)
         [cols rows] (s/get-size screen)
         vcols cols
         vrows (dec rows)
         origin (get-viewport-coords game (:location player) vcols vrows)]
     (draw-world screen vrows vcols origin tiles)
+    (when (get-in game [:debug-flags :show-regions])
+      (draw-regions screen regions vrows vcols origin))
     (doseq [entity (vals entities)]
       (draw-entity screen origin vrows vcols entity))
     (draw-hud screen game)
