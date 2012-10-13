@@ -146,5 +146,6 @@
 (defn random-world []
   (let [world (->World (random-tiles) {})
         world (nth (iterate smooth-world world) 3)
-        world (populate-world world)]
-    (assoc world :regions (get-region-map (:tiles world)))))
+        world (populate-world world)
+        world (assoc world :regions (get-region-map (:tiles world)))]
+    world))

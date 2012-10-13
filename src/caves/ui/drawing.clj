@@ -85,8 +85,7 @@
         {:keys [location hp max-hp]} player
         [x y] location
         info (str "hp [" hp "/" max-hp "]")
-        info (str info " loc: [" x "-" y "]")
-        info (str info " region: [" (get-in game [:world :regions location]) "]")]
+        info (str info " loc: [" x "-" y "]")]
     (s/put-string screen 0 hud-row info)))
 
 
@@ -119,6 +118,7 @@
           (s/put-string screen (- x ox) (- y oy)
                         (get-region-glyph region-number)
                         {:fg :blue}))))))
+
 
 (defn highlight-player [screen origin player]
   (let [[x y] (get-viewport-coords-of origin (:location player))]

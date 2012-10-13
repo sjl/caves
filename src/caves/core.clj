@@ -34,7 +34,10 @@
                  (get-input screen)))))))
 
 (defn new-game []
-  (->Game nil [(->UI :start)] nil {:show-regions false}))
+  (map->Game {:world nil
+              :uis [(->UI :start)]
+              :input nil
+              :debug-flags {:show-regions false}}))
 
 (defn main
   ([] (main :swing false))
