@@ -1,36 +1,14 @@
 (ns caves.ui.input
   (:use [caves.world.generation :only [random-world smooth-world]]
-        [caves.world.core :only [find-empty-tile]]
-        [caves.ui.core :only [->UI]]
-        [caves.entities.player :only [move-player make-player]]
-        [caves.entities.lichen :only [make-lichen]]
-        [caves.entities.bunny :only [make-bunny]]
-        [caves.entities.silverfish :only [make-silverfish]])
+        [caves.entities.player :only [move-player]]
+        [caves.ui.core :only [->UI]])
   (:require [lanterna.screen :as s]))
 
-
-(defn add-creature [world make-creature]
-  (let [creature (make-creature (find-empty-tile world))]
-    (assoc-in world [:entities (:id creature)] creature)))
-
-(defn add-creatures [world make-creature n]
-  (nth (iterate #(add-creature % make-creature)
-                world)
-       n))
-
-(defn populate-world [world]
-  (let [world (assoc-in world [:entities :player]
-                        (make-player (find-empty-tile world)))]
-    (-> world
-      (add-creatures make-lichen 30)
-      (add-creatures make-bunny 20)
-      (add-creatures make-silverfish 4))))
 
 (defn reset-game [game]
   (let [fresh-world (random-world)]
     (-> game
       (assoc :world fresh-world)
-      (update-in [:world] populate-world)
       (assoc :uis [(->UI :play)]))))
 
 

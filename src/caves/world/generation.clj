@@ -1,7 +1,12 @@
 (ns caves.world.generation
   (:use [clojure.set :only (union difference)]
+        [caves.entities.player :only [make-player]]
+        [caves.entities.lichen :only [make-lichen]]
+        [caves.entities.bunny :only [make-bunny]]
+        [caves.entities.silverfish :only [make-silverfish]]
         [caves.world.core :only [tiles get-tile-from-tiles random-coordinate
-                                 world-size ->World tile-walkable?]]
+                                 world-size ->World tile-walkable?
+                                 find-empty-tile]]
         [caves.coords :only [neighbors]]))
 
 
@@ -118,7 +123,28 @@
   (assoc world :tiles (get-smoothed-tiles tiles)))
 
 
+; Creatures -------------------------------------------------------------------
+(defn add-creature [world make-creature]
+  (let [creature (make-creature (find-empty-tile world))]
+    (assoc-in world [:entities (:id creature)] creature)))
+
+(defn add-creatures [world make-creature n]
+  (nth (iterate #(add-creature % make-creature)
+                world)
+       n))
+
+(defn populate-world [world]
+  (let [world (assoc-in world [:entities :player]
+                        (make-player (find-empty-tile world)))]
+    (-> world
+      (add-creatures make-lichen 30)
+      (add-creatures make-bunny 20)
+      (add-creatures make-silverfish 4))))
+
+
+; Actual World Creation -------------------------------------------------------
 (defn random-world []
   (let [world (->World (random-tiles) {})
-        world (nth (iterate smooth-world world) 3)]
+        world (nth (iterate smooth-world world) 3)
+        world (populate-world world)]
     (assoc world :regions (get-region-map (:tiles world)))))
