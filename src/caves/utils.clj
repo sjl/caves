@@ -28,4 +28,4 @@
 
 
 (defn enumerate [s]
-  (map vector (iterate inc 0) s))
+  (map-indexed vector s))

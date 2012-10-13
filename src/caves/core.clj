@@ -23,12 +23,15 @@
 (defn run-game [game screen]
   (loop [{:keys [input uis] :as game} game]
     (when (seq uis)
-      (if (nil? input)
-        (let [game (update-in game [:world] tick-all)
-              _ (draw-game game screen)
-              game (clear-messages game)]
-          (recur (get-input game screen)))
-        (recur (process-input (dissoc game :input) input))))))
+      (recur (if input
+               (-> game
+                 (dissoc :input)
+                 (process-input input))
+               (-> game
+                 (update-in [:world] tick-all)
+                 (draw-game screen)
+                 (clear-messages)
+                 (get-input screen)))))))
 
 (defn new-game []
   (->Game nil [(->UI :start)] nil {:show-regions false}))

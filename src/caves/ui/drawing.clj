@@ -153,4 +153,5 @@
   (s/clear screen)
   (doseq [ui (:uis game)]
     (draw-ui ui game screen))
-  (s/redraw screen))
+  (s/redraw screen)
+  game)
